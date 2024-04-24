@@ -104,15 +104,15 @@
       return fetch(url, options);
     }
 
-    function handleSearch() {
-      const searchValue = document.getElementById('search').value;
-      if (searchValue.trim() !== '') {
-        localStorage.setItem('search', searchValue);
-        window.location.href = 'search_results.html'; // Redirect to search results page
-      }
-    }
-
     function SearchBar() {
+      function handleSearch() {
+        const searchValue = document.getElementById('search').value;
+        console.log('hello bug')
+        if (searchValue.trim() !== '') {
+          localStorage.setItem('search', searchValue);
+          location.reload();
+        }
+      }
       return (
         <div className="search-bar">
           <input
@@ -140,14 +140,82 @@
     }
 
     function SearchContent() {
+      var charities = {};
+      console.log(localStorage.getItem('search'));
+      fetchWithToken('http://127.0.0.1:5001/search', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          searchText: localStorage.getItem('search')
+        })
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data && data.message === 'Search successful!') {
+            console.log('Search Successful!');
+            charities = data.charities;
+            console.log(charities);
+          } else {
+            console.log('Failed to search');
+          }
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
+        });
+      var names = []
+      console.log(charities);
+      for (const [key, value] of Object.entries(charities)) {
+        names.push(key);
+      }
+      while (names.length < 5) {
+        names.push('');
+      }
+      console.log(names);
+      var search1 = charities[names[0]];
+      var search2 = charities[names[1]];
+      var search3 = charities[names[2]];
+      var search4 = charities[names[3]];
+      var search5 = charities[names[4]];
+
       return (
-        <div className="home-content">
-          <h2>Welcome to Charities Hub</h2>
-          <p>
-            Charities Hub aims to bridge the gap between charities and the
-            community by providing detailed information on donation methods,
-            basic information on the charity, and events.
-          </p>
+        <div className="temp">
+          <div className="home-content">
+            <h2>{names[0] ? names[0] : 'No Charities Found'}</h2>
+            <p>{names[0] ? "Contact Info: " + search1['email'] + ", " + search1['phone'] : ''}</p>
+            <p>{names[0] ? "Organization Type: " + search1['orgType'] : ''}</p>
+            <p>{names[0] ? "Organization Bio: " + search1['bio'] : ''}</p>
+          </div>
+          <div className="home-content">
+            <h2>{names[1] ? names[1] : ''}</h2>
+            <p>{names[1] ? "Contact Info: " + search2['email'] + ", " + search2['phone'] : ''}</p>
+            <p>{names[1] ? "Organization Type: " + search2['orgType'] : ''}</p>
+            <p>{names[1] ? "Organization Bio: " + search2['bio'] : ''}</p>
+          </div>
+          <div className="home-content">
+            <h2>{names[2] ? names[2] : ''}</h2>
+            <p>{names[2] ? "Contact Info: " + search3['email'] + ", " + search3['phone'] : ''}</p>
+            <p>{names[2] ? "Organization Type: " + search3['orgType'] : ''}</p>
+            <p>{names[2] ? "Organization Bio: " + search3['bio'] : ''}</p>
+          </div>
+          <div className="home-content">
+            <h2>{names[3] ? names[3] : ''}</h2>
+            <p>{names[3] ? "Contact Info: " + search4['email'] + ", " + search4['phone'] : ''}</p>
+            <p>{names[3] ? "Organization Type: " + search4['orgType'] : ''}</p>
+            <p>{names[3] ? "Organization Bio: " + search4['bio'] : ''}</p>
+          </div>
+          <div className="home-content">
+            <h2>{names[4] ? names[4] : ''}</h2>
+            <p>{names[4] ? "Contact Info: " + search5['email'] + ", " + search5['phone'] : ''}</p>
+            <p>{names[4] ? "Organization Type: " + search5['orgType'] : ''}</p>
+            <p>{names[4] ? "Organization Bio: " + search5['bio'] : ''}</p>
+          </div>
         </div>
       );
     }
