@@ -71,14 +71,10 @@ def charity(email):
     return False
 
 def register(email, password, security, first, last, state):
-    
-    # check if email is valid
-    if not emailValid(email):
-        return False
 
     # check if password is valid - capital letter, special character, 12+ length
     if not passValid(password):
-        return False
+        return -2
 
     # check if email already taken
     users = open("users.txt", "r")
@@ -86,7 +82,7 @@ def register(email, password, security, first, last, state):
     while user != "":
         info = user.split('|')
         if info[0] == email:
-            return False
+            return -3
         else:
             user = users.readline()
     users.close()
@@ -95,7 +91,7 @@ def register(email, password, security, first, last, state):
     users = open("users.txt", "a")
     users.write(email + "|" + password + "|" + security + "|" + first + "|" + last + "|" + state + "\n")
     users.close()
-    return True
+    return 1
 
 
 def forgotPasswordEmail(email):

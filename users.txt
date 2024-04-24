@@ -1,3 +1,4 @@
 john@example.com|Password123!|dog|John|Doe|CA
 dragon@example.com|Ballzinyojawz123!|Deez|Joe|Mama|FL
 f@example.com|Deckofcards1!|F|F|F|FL
+g@example.com|Deckofcards1!|ad|ad|ad|AL

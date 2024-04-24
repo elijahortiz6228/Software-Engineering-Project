@@ -40,11 +40,17 @@ def register():
     security = data.get('security')
     name = f"{firstname} {lastname}"
     
-    if reg(email, password, security, firstname, lastname, state):
+    call = reg(email, password, security, firstname, lastname, state)
+    
+    if call == 1:
         profiles.createProfile(email, '', 'profile-pic.png')
         return jsonify({'message': 'Registration successful!', 'status': 200, 'token': email, 'name': name}), 200
+    elif call == -2:
+        return jsonify({'error': 'Invalid password'}), 401
+    elif call == -3:
+        return jsonify({'error': 'Email is taken'}), 401
     else:
-        return jsonify({'error': 'Incorrect email or password'}), 401
+        return jsonify({'error': 'Incorrect input'}), 401
 
 @app.route('/registerOrg', methods=['POST'])
 def registerOrg():
@@ -56,14 +62,22 @@ def registerOrg():
     addr = data.get('addr')
     orgType = data.get('orgType')
     bio = data.get('bio')
-    if org.charity_register(name,email,password,phone,addr,orgType,bio):
+    
+    call = org.charity_register(name,email,password,phone,addr,orgType,bio)
+
+    if call == 1:
         # Create Profile
         profiles.createProfile(email, bio, 'profile-pic.png')
         # User authenticated, return success response
         return jsonify({'message': 'Registration successful!', 'status': 200, 'token': email, 'name':name}), 200
+    elif call == -1:
+        return jsonify({'error': 'Invalid password'}), 401
+    elif call == -2:
+        return jsonify({'error': 'Invalid phone number'}), 401
+    elif call == -3:
+        return jsonify({'error': 'Email is taken'}), 401
     else:
-        # Incorrect email or password
-        return jsonify({'error': 'Incorrect email or password'}), 401
+        return jsonify({'error': 'Incorrect input'}), 401
 
 @app.route('/signin', methods=['POST'])
 def signin():

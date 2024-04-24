@@ -5,7 +5,7 @@ emailReg = r'[A-Za-z0-9._+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,7}'
 specChar = r'[.!@#$%^&*()\-=_+/?<>`~\[\]]'
 capLetter = r'[A-Z]'
 lengthReq = r'.{12,}'
-phoneNum = r'^\\+?[1-9][0-9]{7,14}$'
+phoneReq = r'^[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$'
 
 
 def emailValid(email):
@@ -21,27 +21,25 @@ def passValid(password):
         return True
 
 def phoneValid(phoneNum):
-    if not re.match(phoneNum, phoneNum):
+    if not re.match(phoneReq, phoneNum):
         return False
     else:
         return True
 
 def charity_register(name, email, password, phoneNumber, address, charityType, charityBio):
-    if not emailValid(email):
-        return False
 
     if not passValid(password):
-        return False
+        return -1
 
     if not phoneValid(phoneNumber):
-        return False
+        return -2
 
     charities = open("charities.txt", "r")
     charity = charities.readline()
     while charity != "":
         info = charity.split(',')
         if info[1] == email:
-            return False
+            return -3
         else:
             charity = charities.readline()
     charities.close()
@@ -49,7 +47,7 @@ def charity_register(name, email, password, phoneNumber, address, charityType, c
     charities = open("charities.txt", "a")
     charities.write(name + "," + email + "," + password + "," + phoneNumber + "," + address + "," + charityType + "," + charityBio + "\n")
     charities.close()
-    return True
+    return 1
 
 def getKeywords(text):
     tokens = nltk.pos_tag(nltk.word_tokenize(text.lower()))
