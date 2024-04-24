@@ -85,6 +85,10 @@
                         <option value="WY">Wyoming</option>
                     </select>
                 </div>
+                <div class="input-group">
+                    <label for="security">What was the name of your first pet?</label>
+                    <input type="text" id="security" name="security" placeholder="Enter your answer" required />
+                </div>
                 <button type="submit">Register</button>
             </form>
         </div>
@@ -98,6 +102,7 @@
             var firstname = document.getElementById("firstname").value;
             var lastname = document.getElementById("lastname").value;
             var state = document.getElementById("state").value;
+            var security = document.getElementById("security").value;
 
             fetch('http://127.0.0.1:5001/register', {
                 method: 'POST',
@@ -109,7 +114,8 @@
                     email: email,
                     firstname: firstname,
                     lastname: lastname,
-                    state: state
+                    state: state,
+                    security: security
                 })
             })
                 .then(response => {

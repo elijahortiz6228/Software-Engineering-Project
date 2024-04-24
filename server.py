@@ -1,9 +1,11 @@
 from flask import Flask, redirect, url_for, request, jsonify, render_template
 from flask_cors import CORS, cross_origin  # Import CORS
 
-from login import register as reg
+from login import forgotPassword, register as reg
 from login import login as log
 from login import charity
+from login import forgotPassword
+from login import resetPassword as reset
 import organizations as org
 import profiles
 
@@ -35,9 +37,10 @@ def register():
     firstname = data.get('firstname')
     lastname = data.get('lastname')
     state = data.get('state')
+    security = data.get('security')
     name = f"{firstname} {lastname}"
     
-    if reg(email, password, 'dog', firstname, lastname, state):
+    if reg(email, password, security, firstname, lastname, state):
         profiles.createProfile(email, '', 'profile-pic.png')
         return jsonify({'message': 'Registration successful!', 'status': 200, 'token': email, 'name': name}), 200
     else:
@@ -74,6 +77,21 @@ def signin():
     else:
         # Incorrect email or password
         return jsonify({'error': 'Incorrect email or password'}), 401
+    
+@app.route('/resetPassword', methods=['POST'])
+def resetPassword():
+    data = request.get_json()
+    email = data.get('email')
+    security = data.get('security')
+    password = data.get('password')
+
+    if forgotPassword(email,security):
+        # User authenticated, reset password and return success response
+        reset(email, password)
+        return jsonify({'message': 'Reset successful!', 'status': 200, 'token': email, 'name': profiles.getName(email), 'charity':charity(email), 'pfp':profiles.getPFP(email)}), 200
+    else:
+        # Incorrect email or security answer
+        return jsonify({'error': 'Incorrect email or security answer'}), 401
     
 @app.route('/getProfile', methods=['POST'])
 def getProfile():
@@ -175,7 +193,7 @@ def search():
     charities = org.charity_search(searchText)
     
     if ch:
-        return jsonify({'message': 'Registration successful!', 'status': 200, 'charities'}), 200
+        return jsonify({'message': 'Registration successful!', 'status': 200, 'charities':5}), 200
     else:
         return jsonify({'error': 'Incorrect email or password'}), 401
 
