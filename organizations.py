@@ -73,6 +73,8 @@ def charity_search(text):
     charities = open("charities.txt", "r")
     charity = charities.readline()
     charitySims = {}
+    if(text==None):
+        return charitySims
     keywords = getKeywords(text)
     while charity != "":
         info = charity.split(',')
@@ -94,19 +96,17 @@ def charity_search(text):
     charities.close()
     ch = []
     for charity in charitySims:
-        if charities[charity]==0:
-            charities.pop(charity)
-        else:
-            ch.append(str(charities[charity])+"|"+charity)
+        if not charitySims[charity]==0:
+            ch.append(str(charitySims[charity])+"|"+charity)
     ch.sort()
+    ch1 = []
     for c in ch:
-        c = c.split('|')[1]
-
-    charities = open("charities.txt", "r")
-    charity = charities.readline()
+        ch1.append(c.split('|')[1])
     ret = {}
     keywords = getKeywords(text)
-    for name in ch:
+    for name in ch1:
+        charities = open("charities.txt", "r")
+        charity = charities.readline()
         while charity != "":
             info = charity.split(',')
             if info[0].lower() == name.lower():
@@ -115,3 +115,4 @@ def charity_search(text):
     charities.close()
     
     return ret
+
