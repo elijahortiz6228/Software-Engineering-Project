@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="test.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <title>Welcome! Charities Hub</title>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function Header() {
+            if (getToken()) {
+                return (
+                    <div className="header">
+                        <h1>Charities Hub</h1>
+                        <div className="userProfile">
+                            <img src={getPFP()} alt="Profile Picture" className="profilePic" />
+                            <div>
+                                <span className="Name"><a href="test.html" style={{ color: 'white', fontWeight: 'bold' }}>{getName()}</a></span>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+            else {
+                return (
+                    <div className="header">
+                        <h1>Charities Hub</h1>
+                        <div className="signin">
+                            <a href="signin.html">Sign In</a>
+                        </div>
+                    </div>
+                );
+            }
+        }
+
+        function Navbar() {
+            function clearCookies() {
+                localStorage.clear();
+                location.reload();
+            }
+            if (getToken()) {
+                return (
+                    <div className="navbar">
+                        <ul>
+                            <li>
+                                <a href="index.html">Home</a>
+                            </li>
+                            <li>
+                                <a href="about.html">About</a>
+                            </li>
+                            <li>
+                                <a href="contact.html">Contact us</a>
+                            </li>
+                            <b>
+                                <a href="index.html"><button onClick={clearCookies}>Sign Out</button></a>
+                            </b>
+                        </ul>
+                    </div>
+                );
+            }
+            else {
+                return (
+                    <div className="navbar">
+                        <ul>
+                            <li>
+                                <a href="index.html">Home</a>
+                            </li>
+                            <li>
+                                <a href="about.html">About</a>
+                            </li>
+                            <li>
+                                <a href="contact.html">Contact us</a>
+                            </li>
+                        </ul>
+                    </div>
+                );
+            }
+        }
+
+        // Function to retrieve the authentication token
+        function isCharity() {
+            return localStorage.getItem('charity');
+        }
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+        function getName() {
+            return localStorage.getItem('name');
+        }
+        function getPFP() {
+            return localStorage.getItem('pfp');
+        }
+
+        // Function to include token in request headers
+        function fetchWithToken(url, options) {
+            const token = getToken();
+            if (token) {
+                // Create a new object for headers and merge them
+                options.headers = Object.assign({}, options.headers || {}, { Authorization: `Bearer ${token}` });
+            }
+            return fetch(url, options);
+        }
+
+        function HomeContent({ userData }) {
+            const [editing, setEditing] = React.useState(false);
+            const [newPFP, setNewPFP] = React.useState(userData[4] || 'profile-pic.png');
+            const [newFirstName, setNewFirstName] = React.useState(userData[0] || 'Firstname');
+            const [newLastName, setNewLastName] = React.useState(userData[1] || 'Lastname');
+            const [newState, setNewState] = React.useState(userData[2] || 'FL');
+            const [newBio, setNewBio] = React.useState(userData[3] || 'Please enter your Bio.');
+
+            const handleEdit = () => {
+                setEditing(true);
+            };
+
+            const handleChangePFP = (event) => {
+                setNewPFP(event.target.value);
+            };
+
+            const handleChangeFirstName = (event) => {
+                setNewFirstName(event.target.value);
+            };
+            const handleChangeLastName = (event) => {
+                setNewLastName(event.target.value);
+            };
+
+            const handleChangeState = (event) => {
+                setNewState(event.target.value);
+            };
+
+            const handleChangeBio = (event) => {
+                setNewBio(event.target.value);
+            };
+
+            const handleSubmit = () => {
+                // Send the updated data to the backend /update endpoint
+                var firstName = newFirstName;
+                var lastName = newLastName;
+                var state = newState;
+                var bio = newBio;
+
+                if (newFirstName == "Firstname") {
+                    firstName = userData[0];
+                }
+                if (newLastName == "Lastname") {
+                    lastName = userData[1];
+                }
+                if (newState == "FL") {
+                    state = userData[2];
+                }
+                if (newBio == "Please enter your Bio.") {
+                    bio = userData[3];
+                }
+
+                fetchWithToken('http://127.0.0.1:5001/update', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: getToken(),
+                        updateType: 'all',
+                        update: {
+                            firstName: firstName,
+                            lastName: lastName,
+                            state: state,
+                            bio: bio,
+                            pfp: newPFP
+                        }
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.message === 'Update successful!') {
+                            console.log('Profile updated successfully!');
+                            localStorage.setItem('name', firstName + ' ' + lastName);
+                            localStorage.setItem('pfp', newPFP);
+                            setEditing(false);
+                            location.reload();
+                        } else {
+                            console.log('Failed to update profile');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+            };
+            return (
+                <div className="home-content">
+                    <div className="profile-pic">
+                        <img src={newPFP} alt="Profile Picture" className="rounded" />
+                    </div>
+                    <h2>Profile Page</h2>
+                    {editing ? (
+                        <div>
+                            <div>
+                                <h3>{"First Name:"}</h3>
+                                <input type="text" defaultValue={userData[0] || 'Firstname'} onChange={handleChangeFirstName} />
+                            </div>
+                            <div>
+                                <h3>{"Last Name:"}</h3>
+                                <input type="text" defaultValue={userData[1] || 'Lastname'} onChange={handleChangeLastName} />
+                            </div>
+                            <div>
+                                <p>Email: <span>{getToken() || 'name@example.com'}</span></p>
+                            </div>
+                            <div>
+                                <h3>{"State of Residence:"}</h3>
+                                <input type="text" defaultValue={userData[2] || 'FL'} onChange={handleChangeState} />
+                            </div>
+                            <div>
+                                <h3>{"Your Bio:"}</h3>
+                                <textarea defaultValue={userData[3] || 'Please enter your Bio.'} onChange={handleChangeBio}></textarea>
+                            </div>
+                            <div>
+                                <button onClick={handleSubmit}>Save</button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div>
+                            <h3>{userData[0] || 'Firstname'} {userData[1] || 'Lastname'}</h3>
+                            <p>Email: <span>{getToken() || 'name@example.com'}</span></p>
+                            <p>State: <span>{userData[2] || 'FL'}</span></p>
+                            <p>Bio: <span>{userData[3] || 'Please enter your Bio.'}</span></p>
+                            <button onClick={handleEdit}>Edit Profile</button>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function Footer() {
+            return (
+                <div className="footer">
+                    <footer>
+                        <p>Created by Elijah Ortiz, Jillian Armstrong, and Megan Arbuckle</p>
+                    </footer>
+                </div>
+            );
+        }
+
+        function App() {
+            const [userData, setUserData] = React.useState([]);
+
+            React.useEffect(() => {
+                fetchWithToken('http://127.0.0.1:5001/getProfile', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email: getToken() })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.message === 'Request successful!') {
+                            setUserData(data.ret);
+                            localStorage.setItem('name', data.ret[0] + " " + data.ret[1]);
+                            localStorage.setItem('pfp', data.ret[4]);
+                        } else {
+                            console.log(data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+            }, []);
+
+            return (
+                <div>
+                    <Header />
+                    <Navbar />
+                    <HomeContent userData={userData} />
+                    <Footer />
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+</body>
+
+</html>

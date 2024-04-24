@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="style6.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="profile-card">
+            <div class="profile-pic">
+                <img alt="Profile Picture" id="profile-pic">
+            </div>
+            <div class="profile-info">
+                <h1 class="name" id="name"></h1>
+                <p class="email" id="email"></p>
+                <p class="state" id="state"></p>
+                <p class="bio" id="bio"></p>
+                <button class="edit-btn" id="edit-btn">Edit Profile</button>
+            </div>
+        </div>
+        <div className="footer">
+            <footer>
+                <p>Created by Elijah Ortiz, Jillian Armstrong, and Megan Arbuckle</p>
+            </footer>
+        </div>
+        <div class="edit-profile-form hidden" id="edit-profile-form">
+            <h2>Edit Profile</h2>
+            <form id="edit-form">
+                <div class="form-group">
+                    <label for="first-name">First Name</label>
+                    <input type="text" id="first-name" name="first-name" autocomplete="given-name">
+                </div>
+                <div class="form-group">
+                    <label for="last-name">Last Name</label>
+                    <input type="text" id="last-name" name="last-name" autocomplete="family-name">
+                </div>
+                <div class="form-group">
+                    <label for="state-edit">State of Residence</label>
+                    <input type="text" id="state-edit" name="state">
+                </div>
+                <div class="form-group">
+                    <label for="bio-edit">Bio</label>
+                    <textarea id="bio-edit" name="bio" rows="4"></textarea>
+                </div>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var token = localStorage.getItem('token');
+            var profilePic = document.getElementById("profile-pic");
+            var nameElement = document.getElementById("name");
+            var emailElement = document.getElementById("email");
+            var stateElement = document.getElementById("state");
+            var bioElement = document.getElementById("bio");
+            var editBtn = document.getElementById("edit-btn");
+            var editForm = document.getElementById("edit-profile-form");
+
+            // Set default values for name and bio
+            profilePic.src = 'profile-pic.png'; // Default profile
+            nameElement.textContent = 'FirstName LastName'; // Default name
+            emailElement.textContent = 'name@example.com'; // Default email
+            stateElement.textContent = 'N/A'; // Default state
+            bioElement.textContent = 'None'; // Default bio
+
+            fetch('http://127.0.0.1:5001/getProfile', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email: token })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.message === 'Request successful!') {
+                        var userData = data.ret;
+                        console.log(data.ret);
+                        profilePic.src = userData[4]; // Assuming profilePic is a URL
+                        console.log(userData[4]);
+                        nameElement.textContent = userData[0] + " " + userData[1];
+                        console.log(userData[0] + " " + userData[1]);
+                        emailElement.textContent = localStorage.getItem('token');
+                        console.log(localStorage.getItem('token'));
+                        stateElement.textContent = userData[2];
+                        console.log(userData[2]);
+                        bioElement.textContent = userData[3];
+                        console.log(userData[3]);
+                    } else {
+                        console.log(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+
+            editBtn.addEventListener('click', () => {
+                editForm.classList.toggle('hidden');
+            });
+
+            var editFormSubmit = document.getElementById("edit-form");
+            editFormSubmit.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                var firstName = document.getElementById("first-name").value;
+                var lastName = document.getElementById("last-name").value;
+                var state = document.getElementById("state-edit").value;
+                var bio = document.getElementById("bio-edit").value;
+
+                fetch('http://127.0.0.1:5001/update', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        email: token,
+                        updateType: "all", // You can send individual update types as well
+                        update: {
+                            firstName: firstName,
+                            lastName: lastName,
+                            state: state,
+                            bio: bio
+                        }
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.message === 'Update successful!') {
+                            // Assuming data.ret contains updated user data
+                            var updatedUserData = data.ret;
+                            nameElement.textContent = firstname + " " + lastname;
+                            emailElement.textContent = localStorage.getItem('token');
+                            stateElement.textContent = state;
+                            bioElement.textContent = bio;
+
+                            editForm.classList.add('hidden');
+                        } else {
+                            console.log(data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>

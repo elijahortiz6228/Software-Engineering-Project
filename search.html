@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <title>Welcome! Charities Hub</title>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function Header() {
+            if (getToken()) {
+                return (
+                    <div className="header">
+                        <h1>Charities Hub</h1>
+                        <div className="userProfile">
+                            <img src={getPFP()} alt="Profile Picture" className="profilePic" />
+                            <span className="Name"><a href="test.html" style={{ color: 'white', fontWeight: 'bold' }}>{getName()}</a></span>
+                        </div>
+                    </div>
+                );
+            }
+            else {
+                return (
+                    <div className="header">
+                        <h1>Charities Hub</h1>
+                        <div className="signin">
+                            <a href="signin.html">Sign In</a>
+                        </div>
+                    </div>
+                );
+            }
+        }
+
+        function Navbar() {
+            function clearCookies() {
+                localStorage.clear();
+                location.reload();
+            }
+            if (getToken()) {
+                return (
+                    <div className="navbar">
+                        <ul>
+                            <li>
+                                <a href="index.html">Home</a>
+                            </li>
+                            <li>
+                                <a href="about.html">About</a>
+                            </li>
+                            <li>
+                                <a href="contact.html">Contact us</a>
+                            </li>
+                            <b>
+                                <button onClick={clearCookies}>Sign Out</button>
+                            </b>
+                        </ul>
+                    </div>
+                );
+            }
+            else {
+                return (
+                    <div className="navbar">
+                        <ul>
+                            <li>
+                                <a href="index.html">Home</a>
+                            </li>
+                            <li>
+                                <a href="about.html">About</a>
+                            </li>
+                            <li>
+                                <a href="contact.html">Contact us</a>
+                            </li>
+                        </ul>
+                    </div>
+                );
+            }
+        }
+
+        // Function to retrieve the authentication token
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+        function getName() {
+            return localStorage.getItem('name');
+        }
+        function getPFP() {
+            return localStorage.getItem('pfp');
+        }
+
+        // Function to include token in request headers
+        function fetchWithToken(url, options) {
+            const token = getToken();
+            if (token) {
+                // Create a new object for headers and merge them
+                options.headers = Object.assign({}, options.headers || {}, { Authorization: `Bearer ${token}` });
+            }
+            return fetch(url, options);
+        }
+
+        function handleSearch() {
+            const searchValue = document.getElementById('search').value;
+            if (searchValue.trim() !== '') {
+                localStorage.setItem('search', searchValue);
+                window.location.href = 'search_results.html'; // Redirect to search results page
+            }
+        }
+
+        function SearchBar() {
+            return (
+                <div className="search-bar">
+                    <input
+                        type="text"
+                        id="search"
+                        name="search"
+                        placeholder="Search charities..."
+                    />
+                    <button type="button" onClick={handleSearch}>Search</button>
+                </div>
+            );
+        }
+
+        function HomeContent() {
+            return (
+                <div className="home-content">
+                    <h2>Welcome to Charities Hub</h2>
+                    <p>
+                        Charities Hub aims to bridge the gap between charities and the
+                        community by providing detailed information on donation methods,
+                        basic information on the charity, and events.
+                    </p>
+                </div>
+            );
+        }
+
+        function Footer() {
+            return (
+                <div className="footer">
+                    <footer>
+                        <p>Created by Elijah Ortiz, Jillian Armstrong, and Megan Arbuckle</p>
+                    </footer>
+                </div>
+            );
+        }
+
+        function App() {
+            return (
+                <div>
+                    <Header />
+                    <Navbar />
+                    <SearchBar />
+                    <HomeContent />
+                    <Footer />
+                </div>
+            );
+        }
+
+        ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+</body>
+
+</html>

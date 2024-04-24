@@ -1,0 +1,1 @@
+john@example.com|Password123!|dog|John|Doe|CA

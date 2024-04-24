@@ -1,0 +1,102 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+    background-color: #f8f9fa;
+}
+
+.header {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    margin: 0;
+}
+
+.signin a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.userProfile {
+    display: flex;
+    align-items: center;
+}
+
+.profilePic {
+    width: 40px;
+    /* Adjust size as needed */
+    height: 40px;
+    /* Adjust size as needed */
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.username {
+    font-weight: bold;
+}
+
+.navbar {
+    background-color: #343a40;
+}
+
+.navbar ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    display: flex;
+}
+
+.navbar b {
+    position: absolute;
+    right: 20px;
+    top: 70px;
+}
+
+.navbar li {
+    margin-right: 20px;
+}
+
+
+.navbar a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.search-bar {
+    padding: 20px;
+    text-align: center;
+}
+
+.search-bar input[type="text"] {
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    width: 300px;
+}
+
+.search-bar button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: #343a40;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.home-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.footer {
+    background-color: #343a40;
+    color: #ffffff;
+    text-align: center;
+    padding: 20px;
+}
