@@ -205,11 +205,8 @@ def search():
     data = request.get_json()
     searchText = data.get('searchText')
     charities = org.charity_search(searchText)
-    
-    if ch:
-        return jsonify({'message': 'Registration successful!', 'status': 200, 'charities':5}), 200
-    else:
-        return jsonify({'error': 'Incorrect email or password'}), 401
+
+    return jsonify({'message': 'Search successful!', 'status': 200, 'charities':charities}), 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
