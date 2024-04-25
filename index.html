@@ -15,6 +15,7 @@
   <div id="root"></div>
 
   <script type="text/babel">
+
     function Header() {
       if (getToken()) {
         return (
@@ -107,9 +108,9 @@
     function SearchBar() {
       function handleSearch() {
         const searchValue = document.getElementById('search').value;
-        console.log('hello bug')
         if (searchValue.trim() !== '') {
           localStorage.setItem('search', searchValue);
+          console.log('submit');
           location.reload();
         }
       }
@@ -139,51 +140,19 @@
       );
     }
 
-    function SearchContent() {
-      var charities = {};
-      console.log(localStorage.getItem('search'));
-      fetchWithToken('http://127.0.0.1:5001/search', {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          searchText: localStorage.getItem('search')
-        })
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data && data.message === 'Search successful!') {
-            console.log('Search Successful!');
-            charities = data.charities;
-            console.log(charities);
-          } else {
-            console.log('Failed to search');
-          }
-        })
-        .catch(error => {
-          console.error('There was a problem with the fetch operation:', error);
-        });
+    function SearchContent({ charities }) {
       var names = []
-      console.log(charities);
       for (const [key, value] of Object.entries(charities)) {
         names.push(key);
       }
       while (names.length < 5) {
         names.push('');
       }
-      console.log(names);
       var search1 = charities[names[0]];
       var search2 = charities[names[1]];
       var search3 = charities[names[2]];
       var search4 = charities[names[3]];
       var search5 = charities[names[4]];
-
       return (
         <div className="temp">
           <div className="home-content">
@@ -231,13 +200,46 @@
     }
 
     function App() {
+      const [charities, setCharities] = React.useState({});
+      React.useEffect(() => {
+        // Fetch data only if search text is available
+        const searchText = localStorage.getItem('search');
+        console.log(searchText);
+        if (searchText) {
+          fetchWithToken('http://127.0.0.1:5001/search', {
+            method: 'POST',
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ searchText })
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+              if (data && data.message === 'Search successful!') {
+                console.log('Search Successful!');
+                setCharities(data.charities);
+                localStorage.removeItem('search');
+              } else {
+                console.log('Failed to search');
+              }
+            })
+            .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+            });
+        }
+      }, []); // Empty dependency array means this effect runs once after the first render
       return (
         <div>
           <Header />
           <Navbar />
           <HomeContent />
           <SearchBar />
-          <SearchContent />
+          <SearchContent charities={charities} />
           <Footer />
         </div>
       );
