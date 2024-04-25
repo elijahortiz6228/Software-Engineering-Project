@@ -17,14 +17,25 @@
   <script type="text/babel">
     function Header() {
       if (getToken()) {
+        if(localStorage.getItem('charity')){
+            return (
+                <div className="header">
+                    <h1>Charities Hub</h1>
+                    <div className="userProfile">
+                        <img src={getPFP()} alt="Profile Picture" className="profilePic" />
+                        <span className="Name"><a href='org-profile.html' style={{ color: 'white', fontWeight: 'bold' }}>{getName()}</a></span>
+                    </div>
+                </div>
+            );
+        }
         return (
-          <div className="header">
-            <h1>Charities Hub</h1>
-            <div className="userProfile">
-              <img src={getPFP()} alt="Profile Picture" className="profilePic" />
-              <span className="Name"><a href="test.html" style={{ color: 'white', fontWeight: 'bold' }}>{getName()}</a></span>
+            <div className="header">
+                <h1>Charities Hub</h1>
+                <div className="userProfile">
+                    <img src={getPFP()} alt="Profile Picture" className="profilePic" />
+                    <span className="Name"><a href='test.html' style={{ color: 'white', fontWeight: 'bold' }}>{getName()}</a></span>
+                </div>
             </div>
-          </div>
         );
       }
       else {
